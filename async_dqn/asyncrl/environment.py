@@ -7,6 +7,8 @@ import gym
 import numpy as np
 import random
 from gym import wrappers
+import tensorflow as tf
+FLAGS = tf.app.flags.FLAGS
 
 # Predefined custom action space in given games
 __custom_actions__ = {'Breakout-v0': [1, 4, 5], # NoOp,, Right, Left
@@ -33,7 +35,10 @@ class GymWrapper:
     def __init__(self, env, actrep=4, memlen=4, w=84, h=84, random_start=30):
         print('Creating wrapper around Gym Environment')
         # self.env = env
-        self.env = wrappers.Monitor(env, "./eval")
+        self.env = wrappers.Monitor(env, "./eval_dqn", force=True)
+        if FLAGS.seed > 0:
+            print ("set seed", FLAGS.seed)
+            self.env.seed(int(FLAGS.seed))
         self.memlen = memlen
         self.W = w
         self.H = h

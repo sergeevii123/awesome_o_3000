@@ -32,6 +32,7 @@ tf.app.flags.DEFINE_integer("tmax", 5, "Maximum batch size")
 tf.app.flags.DEFINE_integer("action_repeat", 4, "Applies last action to X next frames")
 tf.app.flags.DEFINE_integer("memory_len", 4, "Memory length - number of stacked input images")
 # Environment settings
+tf.app.flags.DEFINE_string("seed", -1, "set seed")
 tf.app.flags.DEFINE_string("env", 'MsPacman-v0', "Environment name (available all OpenAI Gym environments)")
 tf.app.flags.DEFINE_boolean("render", False, "Render frames? Significantly slows down training process")
 tf.app.flags.DEFINE_integer("width", 84, "Screen image width")

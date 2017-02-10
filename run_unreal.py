@@ -15,6 +15,10 @@ from unreal.environment import environment
 from collections import deque
 
 
+FLAGS = tf.app.flags.FLAGS
+tf.app.flags.DEFINE_string("seed", -1, "set seed")
+tf.app.flags.DEFINE_string("env", 'MsPacman-v0', "Environment name (available all OpenAI Gym environments)")
+
 class StateHistory(object):
   def __init__(self):
     self._states = deque(maxlen=3)
@@ -50,7 +54,7 @@ class ValueHistory(object):
 class GymEnvironment(environment.Environment):
     @staticmethod
     def get_action_size():
-        env = gym.make("MsPacman-v0")
+        env = gym.make(FLAGS.env)
         return env.action_space.n
 
     def __init__(self, display=False, frame_skip=0, no_op_max=30):
@@ -62,7 +66,7 @@ class GymEnvironment(environment.Environment):
             self._frame_skip = 1
         self._no_op_max = no_op_max
 
-        self.env = gym.make("MsPacman-v0")
+        self.env = gym.make(FLAGS.env)
         self.reset()
 
     def reset(self):
@@ -145,8 +149,7 @@ for i in xrange(100):
         last_action_reward = ExperienceFrame.concat_action_and_reward(last_action, action_size,
                                                                       last_reward)
 
-        pi_values, v_value = global_network.run_base_policy_and_value(sess,environment.last_state.mean(-1,
-                                                                                                            keepdims=True),
+        pi_values, v_value = global_network.run_base_policy_and_value(sess,environment.last_state,
                                                                            last_action_reward)
         value_history.add_value(v_value)
 
@@ -158,3 +161,12 @@ for i in xrange(100):
             print(episode_reward)
             environment.reset()
             episode_reward = 0
+
+import sys
+
+def main(args):
+    for arg in args:
+        print(arg)
+
+if __name__ == '__main__':
+    main(sys.argv)

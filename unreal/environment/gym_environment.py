@@ -9,12 +9,13 @@ import gym
 from gym import wrappers
 from unreal.constants import ENV_NAME
 from unreal.environment import environment
+import tensorflow as tf
+FLAGS = tf.app.flags.FLAGS
 
 class GymEnvironment(environment.Environment):
   @staticmethod
   def get_action_size():
-    env = gym.make(ENV_NAME)
-    env = wrappers.Monitor(env, "./eval")
+    env = gym.make(FLAGS.env)
     return env.action_space.n
   
   def __init__(self, display=False, frame_skip=0, no_op_max=30):
@@ -26,7 +27,11 @@ class GymEnvironment(environment.Environment):
       self._frame_skip = 1
     self._no_op_max = no_op_max
     
-    self.env = gym.make(ENV_NAME)
+    self.env = gym.make(FLAGS.env)
+    self.env = wrappers.Monitor(self.env, "./eval_unreal", force=True)
+    if FLAGS.seed>0:
+      print ("set seed", FLAGS.seed)
+      self.env.seed(int(FLAGS.seed))
     self.reset()
 
   def reset(self):

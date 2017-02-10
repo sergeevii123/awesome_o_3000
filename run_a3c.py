@@ -8,7 +8,12 @@ import multiprocessing
 
 import os
 
-a_size = gym.make("Skiing-v0").action_space.n
+
+FLAGS = tf.app.flags.FLAGS
+tf.app.flags.DEFINE_string("seed", -1, "set seed")
+tf.app.flags.DEFINE_string("env", 'MsPacman-v0', "Environment name (available all OpenAI Gym environments)")
+
+a_size = gym.make(FLAGS.env).action_space.n
 load_model = True
 create_submission = True
 
@@ -50,3 +55,11 @@ with tf.Session() as sess:
         worker_threads.append(t)
     coord.join(worker_threads)
 
+import sys
+
+def main(args):
+    for arg in args:
+        print(arg)
+
+if __name__ == '__main__':
+    main(sys.argv)

@@ -5,7 +5,7 @@ import scipy.signal
 import gym
 import cv2
 from gym import wrappers
-
+FLAGS = tf.app.flags.FLAGS
 
 # Copies one set of variables to another.
 # Used to set worker network parameters to those of global network.
@@ -117,10 +117,13 @@ class Worker():
         # Create the local copy of the network and the tensorflow op to copy global paramters to local network
         self.local_AC = BaseNetwork(a_size, self.name, trainer)
         self.update_local_ops = update_target_graph('global', self.name)
-        self.env = gym.make("Skiing-v0")
+        self.env = gym.make(FLAGS.env)
+        if FLAGS.seed > 0:
+            print ("set seed", FLAGS.seed)
+            self.env.seed(int(FLAGS.seed))
         self.create_submission = create_submission
         if create_submission:
-            self.env = wrappers.Monitor(self.env, './eval', force=True)
+            self.env = wrappers.Monitor(self.env, './eval_a3c', force=True)
 
 
     def train(self, rollout, sess, gamma, bootstrap_value):

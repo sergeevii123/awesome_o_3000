@@ -110,7 +110,7 @@ class UnrealModel(object):
         with tf.variable_scope("base_lstm", reuse=reuse) as scope:
             hidden = slim.fully_connected(slim.flatten(conv_output), 256)
             # lstm_input = tf.concat(1, [hidden, last_action_reward_input])
-            rnn_in = tf.expand_dims(tf.concat(1, [hidden]), [0])
+            rnn_in = tf.expand_dims(tf.concat(1, [hidden, last_action_reward_input]), [0])
             step_size = tf.shape(conv_output)[:1]
             lstm_outputs, lstm_state = tf.nn.dynamic_rnn(
                 self.lstm_cell, rnn_in, initial_state=initial_state_input, sequence_length=step_size,

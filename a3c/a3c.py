@@ -218,7 +218,7 @@ class Worker():
                 self.episode_mean_values.append(np.mean(episode_values))
 
                 if self.create_submission:
-                    print np.mean(self.episode_rewards[-100:])
+                    print np.mean(self.episode_rewards[-100:]), episode_reward
                 else:
                     print "worker", str(self.number), "ended episode", curre, episode_reward
 

@@ -70,7 +70,6 @@ class BaseNetwork():
                                               weights_initializer=normalized_columns_initializer(1.0),
                                               biases_initializer=None)
 
-            # Only the worker network need ops for loss functions and gradient updating.
             if scope != 'global':
                 self.actions = tf.placeholder(shape=[None], dtype=tf.int32)
                 self.actions_onehot = tf.one_hot(self.actions, a_size, dtype=tf.float32)
@@ -81,8 +80,8 @@ class BaseNetwork():
 
                 # Loss functions
                 self.value_loss = 0.5 * tf.reduce_sum(tf.square(self.target_v - tf.reshape(self.value, [-1])))
-                self.entropy = - tf.reduce_sum(self.policy * tf.log(self.policy))
-                self.policy_loss = -tf.reduce_sum(tf.log(self.responsible_outputs) * self.advantages)
+                self.entropy = - tf.reduce_sum(self.policy * tf.log(self.policy + 10e-6))
+                self.policy_loss = -tf.reduce_sum(tf.log(self.responsible_outputs + 10e-6) * self.advantages)
                 self.loss = 0.5 * self.value_loss + self.policy_loss - self.entropy * 0.01
 
                 # Get gradients from local network using local losses
@@ -133,7 +132,6 @@ class Worker():
         rewards = rollout[:, 2]
         values =  rollout[:, 5]
 
-        # The advantage function uses "Generalized Advantage Estimation"
         self.rewards_plus = np.asarray(rewards.tolist() + [bootstrap_value])
         discounted_rewards = discount(self.rewards_plus, gamma)[:-1]
         self.value_plus = np.asarray(values.tolist() + [bootstrap_value])
@@ -185,8 +183,7 @@ class Worker():
                     a = np.random.choice(a_dist[0], p=a_dist[0])
                     a = np.argmax(a_dist == a)
 
-                    # print a_dist
-                    s1, r, d, real_rew = self.env.step(a)
+                    s1, r, d, _ = self.env.step(a)
                     s1 = process_frame(s1)
                     if d is False:
                         episode_frames.append(s1)
